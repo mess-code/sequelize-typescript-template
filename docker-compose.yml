@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  postgres:
+    image: "postgres"
+    container_name: postgres-container
+    environment:
+      POSTGRES_PASSWORD: "password"
+    volumes:
+      - "./postgres/data:/var/lib/postgresql/data:delegated"
+    ports:
+      - "5432:5432"
+
+  approval-worker:
+    image: node:12-alpine
+    working_dir: /app
+    command: sh -c "yarn install --ignore-optional && yarn run dev"
+    container_name: approval-worker-container
+    volumes:
+      - './:/app:cached'
+      - /app/node_modules
+    ports:
+      - '9000:80'
+    depends_on:
+      - postgres
